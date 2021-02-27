@@ -2,18 +2,24 @@
   <div id="player-box-wrap" class="player-box-wrap" v-if="song.id">
     <div id="background-img" class="background"></div>
     <div class="player-box">
-      <i class="iconfont btn btn-hide" @click.stop="setPlayerShow(false)">&#xe70f;</i>
+      <i class="iconfont btn btn-hide" @click.stop="setPlayerShow(false)"
+        >&#xe70f;</i
+      >
       <i class="iconfont btn btn-menu">&#xe725;</i>
       <h1 class="song-name">{{ getSong.name }}</h1>
 
       <div class="song-info-top">
-        <p class="song-singer">—&nbsp;&nbsp;<span>{{ song.singer[0].name }}</span>&nbsp;&nbsp;—</p>
+        <p class="song-singer">
+          —&nbsp;&nbsp;<span>{{ song.singer[0].name }}</span
+          >&nbsp;&nbsp;—
+        </p>
         <p class="tags">
           <i class="iconfont icon-sq">&#xe8a9;</i>
           <i class="iconfont icon-only">&#xe8aa;</i>
         </p>
         <div class="song-album-cover">
-          <img :src="getAlbumCover">
+          <img id="album-cover" class="album-img" :src="getAlbumCover" />
+          <!-- <img id="album-cover" :src="getAlbumCover" /> -->
         </div>
         <p class="lyric">{{ getCurrentLyric }}</p>
       </div>
@@ -22,20 +28,42 @@
         <!-- 播放进度 -->
         <div class="range-wrap">
           <span class="currentTime">{{ playingTime | playingTimeFormat }}</span>
-          <input type="range" id="range" class="range" min="0" :max="duration" :value="playingTime" />
+          <input
+            type="range"
+            id="range"
+            class="range"
+            min="0"
+            :max="duration"
+            :value="playingTime"
+          />
           <span class="duration">{{ duration | durationFormat }}</span>
         </div>
         <!-- 开始暂停、下一首等按钮 -->
         <div class="play-operations">
-          <i class="iconfont btn-play-method" v-html="getPlayMethod.icon" @click.stop="changePlayMethod(playMethod)"></i>
+          <i
+            class="iconfont btn-play-method"
+            v-html="getPlayMethod.icon"
+            @click.stop="changePlayMethod(playMethod)"
+          ></i>
           <i class="iconfont btn-prev" @click.stop="prevSong">&#xe8ab;</i>
-          <i class="iconfont btn-play" v-html="playState ? '&#xe710;' : '&#xe6d9;'" @click.stop="play"></i>
+          <i
+            class="iconfont btn-play"
+            v-html="playState ? '&#xe710;' : '&#xe6d9;'"
+            @click.stop="play"
+          ></i>
           <i class="iconfont btn-next" @click.stop="nextSong">&#xe617;</i>
-          <i class="iconfont btn-play-list" @click.stop="setPlaylistShow(true)">&#xe604;</i>
+          <i class="iconfont btn-play-list" @click.stop="setPlaylistShow(true)"
+            >&#xe604;</i
+          >
         </div>
         <!-- 分享、下载等按钮 -->
         <div class="other-operations">
-          <i class="iconfont btn-like" @click.stop="setSongLiked(song)" :class="liked ? 'liked' : ''" v-html="liked ? '&#xe699;' : '&#xe607;'"></i>
+          <i
+            class="iconfont btn-like"
+            @click.stop="setSongLiked(song)"
+            :class="liked ? 'liked' : ''"
+            v-html="liked ? '&#xe699;' : '&#xe607;'"
+          ></i>
           <i class="iconfont btn-download">&#xe890;</i>
           <i class="iconfont btn-share">&#xe60d;</i>
           <i class="iconfont btn-comment">&#xe694;</i>
@@ -46,137 +74,157 @@
 </template>
 
 <script>
-import { mapState, mapGetters, mapActions } from 'vuex'
+import { mapState, mapGetters, mapActions } from "vuex";
 
 export default {
   computed: {
     ...mapState([
-      'playMethod',
-      'playState',
-      'song',
-      'songIndex',
-      'playlist',
-      'duration',
-      'playingTime',
-      'currentLyricIndex',
-      'likedSongs'
+      "playMethod",
+      "playState",
+      "song",
+      "songIndex",
+      "playlist",
+      "duration",
+      "playingTime",
+      "currentLyricIndex",
+      "likedSongs"
     ]),
-    ...mapGetters([
-      'getAlbumCover',
-      'getPlayMethod'
-    ]),
+    ...mapGetters(["getAlbumCover", "getPlayMethod"]),
     // 获取歌曲
-    getSong: function () {
-      if(!this.song.id) {
-        this.song.id = this.song.songid
+    getSong: function() {
+      if (!this.song.id) {
+        this.song.id = this.song.songid;
       }
-      if(!this.song.name) {
-        this.song.name = this.song.songname
+      if (!this.song.name) {
+        this.song.name = this.song.songname;
       }
-      return this.song
+      return this.song;
     },
     // 获取当前歌曲是否已被标记为我喜欢
-    liked: function () {
-      var index = this.likedSongs.indexOf(this.getSong.id)
-      return index > -1
+    liked: function() {
+      var index = this.likedSongs.indexOf(this.getSong.id);
+      return index > -1;
     },
     // 获取当前歌词
-    getCurrentLyric: function () {
-      var time = this.playingTime * 1000
+    getCurrentLyric: function() {
+      var time = this.playingTime * 1000;
       // console.log(this.song.lyric.lyric)
       if (this.song.lyric && this.song.lyric.lyricArr) {
-        var lyricArr = this.song.lyric.lyricArr
-        var timeArr = this.song.lyric.timeArr
+        var lyricArr = this.song.lyric.lyricArr;
+        var timeArr = this.song.lyric.timeArr;
 
-        if(lyricArr.length > 0) {
+        if (lyricArr.length > 0) {
           if (time < timeArr[this.currentLyricIndex + 1]) {
-            if (lyricArr[this.currentLyricIndex] !== '' && lyricArr[this.currentLyricIndex] !== '\n') {
-              return lyricArr[this.currentLyricIndex]
+            if (
+              lyricArr[this.currentLyricIndex] !== "" &&
+              lyricArr[this.currentLyricIndex] !== "\n"
+            ) {
+              return lyricArr[this.currentLyricIndex];
             } else {
-              this.updateLyricIndex()
-              return lyricArr[this.currentLyricIndex - 1]
+              this.updateLyricIndex();
+              return lyricArr[this.currentLyricIndex - 1];
             }
           } else {
-            this.updateLyricIndex()
-            return lyricArr[this.currentLyricIndex - 1]
+            this.updateLyricIndex();
+            return lyricArr[this.currentLyricIndex - 1];
           }
-        } 
+        }
       }
     }
   },
   methods: {
     ...mapActions([
-      'play',
-      'setPlayerShow',
-      'changeSongPlay',
-      'updatePlayingTime',
-      'updateLyricIndex',
-      'changePlayMethod',
-      'setPlaylistShow',
-      'setSongLiked'
+      "play",
+      "setPlayerShow",
+      "changeSongPlay",
+      "updatePlayingTime",
+      "updateLyricIndex",
+      "changePlayMethod",
+      "setPlaylistShow",
+      "setSongLiked"
     ]),
     // 上一首
-    prevSong: function () {
-      var index = this.songIndex
+    prevSong: function() {
+      var index = this.songIndex;
       if (this.playMethod === 0) {
         if (index === 0) {
-          index = this.playlist.length
+          index = this.playlist.length;
         }
-        index = index - 1
+        index = index - 1;
       } else if (this.playMethod === 1) {
         // index不变
       } else if (this.playMethod === 2) {
-        index = parseInt((this.playlist.length - 1) * Math.random())
+        index = parseInt((this.playlist.length - 1) * Math.random());
       }
-      var prevSong = this.playlist[index]
-      this.changeSongPlay({ song: prevSong, index: index })
+      var prevSong = this.playlist[index];
+      this.changeSongPlay({ song: prevSong, index: index });
     },
     // 下一首
-    nextSong: function () {
-      var index = this.songIndex
+    nextSong: function() {
+      var index = this.songIndex;
       if (this.playMethod === 0) {
-        index = index + 1
+        index = index + 1;
         if (index === this.playlist.length) {
-          index = 0
+          index = 0;
         }
       } else if (this.playMethod === 1) {
         // index不变
       } else if (this.playMethod === 2) {
-        index = parseInt((this.playlist.length - 1) * Math.random())
+        index = parseInt((this.playlist.length - 1) * Math.random());
       }
-      var nextSong = this.playlist[index]
-      this.changeSongPlay({ song: nextSong, index: index })
+      var nextSong = this.playlist[index];
+      this.changeSongPlay({ song: nextSong, index: index });
     }
   },
   watch: {
-    getAlbumCover: function (url) {
-      if (document.getElementById('background-img')) {
-        document.getElementById('background-img').style.backgroundImage = 'url(' + url + ')'
+    getAlbumCover: function(url) {
+      if (document.getElementById("background-img")) {
+        document.getElementById("background-img").style.backgroundImage =
+          "url(" + url + ")";
       } else {
-        setTimeout(function () {
-          document.getElementById('background-img').style.backgroundImage = 'url(' + url + ')'
-        }, 1000)
+        setTimeout(function() {
+          document.getElementById("background-img").style.backgroundImage =
+            "url(" + url + ")";
+        }, 1000);
+      }
+    },
+    playState: function(play) {
+      if (play) {
+        // 底部播放条 专辑封面图 开始旋转
+        document.getElementById("album-cover").style.animationPlayState =
+          "running";
+      } else {
+        // 底部播放条 专辑封面图 停止旋转
+        document.getElementById("album-cover").style.animationPlayState =
+          "paused";
       }
     }
   },
   filters: {
-    durationFormat: function (duration) {
-      var minutes = parseInt(duration / 60)
-      var seconds = parseInt(duration % 60)
-      return (Array(2).join(0) + minutes).slice(-2) + ':' + (Array(2).join(0) + seconds).slice(-2)
+    durationFormat: function(duration) {
+      var minutes = parseInt(duration / 60);
+      var seconds = parseInt(duration % 60);
+      return (
+        (Array(2).join(0) + minutes).slice(-2) +
+        ":" +
+        (Array(2).join(0) + seconds).slice(-2)
+      );
     },
-    playingTimeFormat: function (time) {
-      var minutes = parseInt(time / 60)
-      var seconds = parseInt(time % 60)
-      return (Array(2).join(0) + minutes).slice(-2) + ':' + (Array(2).join(0) + seconds).slice(-2)
+    playingTimeFormat: function(time) {
+      var minutes = parseInt(time / 60);
+      var seconds = parseInt(time % 60);
+      return (
+        (Array(2).join(0) + minutes).slice(-2) +
+        ":" +
+        (Array(2).join(0) + seconds).slice(-2)
+      );
     }
   }
-}
+};
 </script>
 
-
 <style lang="scss" scoped>
-$green: #41B883;
+$green: #41b883;
 $gray: rgba(255, 255, 255, 0.6);
 $mainPadding: 15px;
 
@@ -213,7 +261,7 @@ $mainPadding: 15px;
     width: 100%;
     height: 100%;
     color: $gray;
-    background-color: rgba(0, 0, 0, .7);
+    background-color: rgba(0, 0, 0, 0.7);
   }
 
   .btn {
@@ -279,9 +327,9 @@ $mainPadding: 15px;
   .song-album-cover {
     // padding: $mainPadding 0;
 
-    img {
+    .album-img {
       width: 65%;
-      border: 5px solid rgba(0, 0, 0, .3);
+      border: 5px solid rgba(0, 0, 0, 0.3);
       border-radius: 50%;
       animation: roll360 25s infinite linear;
     }
@@ -411,7 +459,7 @@ $mainPadding: 15px;
   }
 
   .btn-like.liked {
-    color: #e84a4a
+    color: #e84a4a;
   }
 }
 
